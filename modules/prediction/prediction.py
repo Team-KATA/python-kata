@@ -34,6 +34,7 @@ def prediction(_df: str, _col: str, _index_col: str, _amount: float):
     diff_df = defferencing_data(df, _col)
     best_order = optimize_order(diff_df)
     model = train(df, _col, best_order)
+
     result = forecast(model, len(df), int(len(df)+_amount))
 
     # df[_col].plot()
@@ -44,4 +45,3 @@ def prediction(_df: str, _col: str, _index_col: str, _amount: float):
 
 # result = prediction("/workspace/Forage/python-kata/modules/prediction/arima_train - full.csv", "dew", "datetime", 10)
 # print(f'result : \n{result}')
-    

@@ -4,20 +4,17 @@ from bs4 import BeautifulSoup
 from tqdm.notebook import tqdm
 from datetime import datetime, timedelta
 
-# artdic = crawling("2023-10-13", "2023-10-18", [POLITICAL_SEED2])
-# to_csv(artdic, path)
 
 
-POLITICS_CATEGORY_SEED = 100
+    
+POLITICS_CATEGORY_SID = 100
 
-POLITICAL_SEED1 = "대통령실"
-POLITICAL_SEED2 = "북한"
-POLITICAL_SEED3 = "국방/외교"
+POLITICAL_SID1 = "북한"
+POLITICAL_SID2 = "국방/외교"
 __POLITICAL_CATEGORIES = {
-     POLITICAL_SEED1: 264,
-      POLITICAL_SEED2: 268,
-      POLITICAL_SEED3: 267
-  }
+      POLITICAL_SID1: 268,
+      POLITICAL_SID2: 267 
+}
 
 
 def __date_producer(start_date_str, end_date_str):
@@ -30,6 +27,19 @@ def __date_producer(start_date_str, end_date_str):
         start_date += delta
     return date_list
 
+def __find_max_page(base_url):
+    url = base_url
+    while True:
+        html = requests.get(url, headers = {"User-Agent": "Mozilla/5.0 "\
+        "(Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"\
+        "Chrome/110.0.0.0 Safari/537.36"})
+        soup = BeautifulSoup(html.text, 'lxml')
+        page_list = soup.select('div.paging a')
+        max_page = max(int(a.text) for a in page_list if a.text.isdigit())
+        if len(page_list)<10:
+            break
+        url = base_url+'&page='+str(max_page)
+    return max_page
 
 def __ex_tag(sid1, sid2, page, date):
     url = f"https://news.naver.com/main/list.naver?mode=LS2D&sid2={sid2}&mid=shm&sid1={sid1}&date={date}&page={page}"
@@ -40,27 +50,27 @@ def __ex_tag(sid1, sid2, page, date):
     a_tag = soup.find_all("a")
     tag_lst = []
     for a in a_tag:
-        if "href" in a.attrs:
+        if "href" in a.attrs:  # href가 있는것만 고르는 것
             if (f"sid=100" in a["href"]) and ("article" in a["href"]):
                 tag_lst.append(a["href"])
     return tag_lst
-
-
-def __re_tag(sid1, sid2, pages, date_list):
+    
+def __re_tag(sid1, sid2, date_list):
     re_lst = []
     for date in date_list:
+        url = f"https://news.naver.com/main/list.naver?mode=LS2D&sid2={sid2}&mid=shm&sid1={sid1}&date={date}"
+        pages = __find_max_page(url)
         for i in range(pages):
             lst = __ex_tag(sid1, sid2, i+1, date)
             re_lst.extend(lst)
     return list(set(re_lst))
 
 
-def __make_hrefs(sids, pages, date_list):
+def __make_hrefs(sids, date_list):
     hrefs = {}
     for sid2 in sids:
-        hrefs[sid2] = __re_tag(POLITICS_CATEGORY_SEED, sid2, pages, date_list)
+        hrefs[sid2] = __re_tag(POLITICS_CATEGORY_SID, sid2, date_list)
     return hrefs
-
 
 def __art_crawl(hrefs, sid, index):
     art_dic = {}
@@ -86,8 +96,11 @@ def __art_crawl(hrefs, sid, index):
     author = soup.select(author_selector)
     author_lst = [a.text for a in author]
     author_str = "".join(author_lst)
-
-    media_company = soup.select(media_company_selector)[0].get('title')
+    
+    try:
+        media_company = soup.select(media_company_selector)[0].get('title')
+    except:
+        pass
     
     main = soup.select(main_selector)
     main_lst = []
@@ -104,8 +117,8 @@ def __art_crawl(hrefs, sid, index):
     return art_dic
 
 
-def __solution(sids, pages, date_list):
-    hrefs = __make_hrefs(sids, pages, date_list)
+def __solution(sids, date_list):
+    hrefs = __make_hrefs(sids, date_list)
     artdic_lst = []
     for section in sids:
         for i in range(len(hrefs[section])):
@@ -122,7 +135,9 @@ def to_csv(artdic: list, path="ar.csv"):
 
     
 def crawling(start_date: str, end_date:str , categories=list(__POLITICAL_CATEGORIES.keys())) -> list:
-    categories_seeds = list(map(lambda x: __POLITICAL_CATEGORIES[x], 
+    categories_sids = list(map(lambda x: __POLITICAL_CATEGORIES[x], 
         filter(lambda x: x in __POLITICAL_CATEGORIES.keys(), list(set(categories)))))
     date_list = __date_producer(start_date, end_date)
-    return __solution(categories_seeds, 1, date_list)
+    return __solution(categories_sids, date_list)
+
+#artdic = crawling("2023-10-15", "2023-10-15")
