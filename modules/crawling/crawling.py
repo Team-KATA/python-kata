@@ -13,7 +13,8 @@ POLITICAL_SID1 = "북한"
 POLITICAL_SID2 = "국방/외교"
 __POLITICAL_CATEGORIES = {
       POLITICAL_SID1: 268,
-  }
+      POLITICAL_SID2: 267 
+}
 
 
 def __date_producer(start_date_str, end_date_str):
