@@ -39,6 +39,6 @@ def prediction(_df: str, _col: str, _index_col: str, _amount: float) -> list:
     return list(result)
 
 
-result = prediction("arima_train - full.csv", "dew", "datetime", 0.02)
-print(f'result : \n{result}')
+# result = prediction("arima_train - full.csv", "dew", "datetime", 0.02)
+# print(f'result : \n{result}')
     
