@@ -30,15 +30,15 @@ def forecast(_model: SARIMAX, _start: int, _end: int) -> pd.core.series.Series:
     _forecast.plot()
     return _forecast
 
-def prediction(_df: str, _col: str, _index_col: str, _start: float) -> list:
+def prediction(_df: str, _col: str, _index_col: str, _amount: float) -> list:
     df = load_csv(_df, _index_col)
     diff_df = defferencing_data(df, _col)
     best_order = optimize_order(diff_df)
     model = train(df, _col, best_order)
-    result = forecast(model, int(len(df)*_start), len(df)-1)
+    result = forecast(model, int(len(df)*(1-_amount)), len(df)-1)
     return list(result)
 
 
-# result = prediction("arima_train - full.csv", "dew", "datetime", 0.98)
-# print(f'result : \n{result}')
+result = prediction("arima_train - full.csv", "dew", "datetime", 0.02)
+print(f'result : \n{result}')
     
