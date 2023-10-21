@@ -25,22 +25,23 @@ def train(_df, _col, _order):
     model_fit = model.fit()
     return model_fit
 
-def forecast(_model: SARIMAX, _start: int, _end: int) -> pd.core.series.Series:
-    _forecast = _model.predict(start=_start, end=_end)
-    _forecast.plot()
+def forecast(_model: SARIMAX, _start: int, _amount: int) -> pd.core.series.Series:
+    _forecast = _model.predict(start=_start, end=_amount)
     return _forecast
 
-def prediction(_df: str, _col: str, _index_col: str, _amount: float) -> list:
+def prediction(_df: str, _col: str, _index_col: str, _amount: float):
     df = load_csv(_df, _index_col)
     diff_df = defferencing_data(df, _col)
     best_order = optimize_order(diff_df)
     model = train(df, _col, best_order)
-    result = forecast(model, int(len(df)*(1-_amount)), len(df)-1)
-    return list(result)
+
+    result = forecast(model, len(df), int(len(df)+_amount))
+
+    # df[_col].plot()
+    # result.plot()
+
+    return result
 
 
-
-# result = prediction("arima_train - full.csv", "dew", "datetime", 0.02)
+# result = prediction("/workspace/Forage/python-kata/modules/prediction/arima_train - full.csv", "dew", "datetime", 10)
 # print(f'result : \n{result}')
-
-    
