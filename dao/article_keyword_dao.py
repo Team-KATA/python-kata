@@ -1,5 +1,5 @@
 from typing import Optional
-from _article_keyword import article_keyword
+from article_keyword import article_keyword
 
 article_keywords_db = {}
 

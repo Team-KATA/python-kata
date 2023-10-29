@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from article import Article
-from keyword import keyword
+from _keyword import Keyword
 
 
 class ArticleKeyword(BaseModel):
