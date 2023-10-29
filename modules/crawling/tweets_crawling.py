@@ -10,5 +10,5 @@ def tweets_crawling(consumer_key, consumer_secret, access_token, access_token_se
     # 특정 키워드가 포함된 트윗을 검색합니다. 
     public_tweets = api.search(q=keyword, lang="ko", count=5)
 
-    for tweet in public_tweets:
-        print(tweet.text)
+    return public_tweets
+
