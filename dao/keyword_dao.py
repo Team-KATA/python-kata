@@ -1,5 +1,5 @@
 from typing import Optional
-from keyword_fixture import Keyword
+from _keyword import Keyword
 
 keywords_db = {}
 
